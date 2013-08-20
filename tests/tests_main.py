@@ -1,5 +1,5 @@
 import unittest
-from helloWord import main
+from helloword import main
 
 
 class TestMain(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestMain(unittest.TestCase):
         element = main.main()
 
         self.assertEqual(element, "helo word")
-    doctest.testfile("example.txt")
+
 
 
 if __name__ == '__main__':
