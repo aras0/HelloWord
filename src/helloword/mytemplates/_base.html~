@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<title>Wyszukiwarka Ofert</title>
+		<!--	<link href="/stylesheets/main.css" rel="stylesheet" type="text/css" /> -->
+			<link href="/stylesheets/menus.css" type="text/css" rel="stylesheet"/>
+			<script src="/script/jquery-1.10.2.min.js"></script>
+			<script src="/script/jquery_1_4_2.js"></script>
+			<script src="/script/angular/angular.js"></script>
+			<script src="/script/angular/angular-resource.js"></script>
+			<script src="/script/script.js"></script>
+			<script src="/script/menu.js"></script>
+	</head>
+	<body>
+		<div id="header">
+	<!--<h1>
+	<li><a href="/index"
+	{% ifequal path '/index' %}
+				class="selected"
+	{% endifequal %} 
+	>Wyszukiwarka Ofert</a></li>
+	</h1> -->
+	</div> <!--oabo na koncu-->
+	
+	<div id="top_menu_naglowek">
+            <div id="top-menu">
+                <div>
+                    <ul class="menu">
+                       <li><a href="/index"
+																	{% ifequal path '/index' %}
+																	class="selected"
+																	{% endifequal %}
+																	>Wyszukiwarka Ofert</a></li>
+																	
+															<li><a href="/search"
+																	{% ifequal path '/search' %}
+																				class="selected"
+																	{% endifequal %}
+																	>Search</a></li>
+																	
+															<li><a href="mytemplates/sites.html">Sites</a></li>
+															
+															<li><a href="mytemplates/topics.html" >Topics</a></li>
+															
+															<li><a href="index" >&darr; Page User </a>
+																			<ul>
+																					<li><a href="/login"
+																							{% ifequal path '/login' %}
+																										class="selected"
+																							{% endifequal %}
+																							>Login</a></li>
+																					<li><a href="/creatUser"
+																							{% ifequal path '/creatUser' %}
+																										class="selected"
+																							{% endifequal %}
+																							>Create new User</a></li>
+																			</ul>
+															</li>
+
+															
+                    </ul>
+										</div>
+								</div>
+	</div>
+
+	<div id="bodycontent">
+	{% block bodycontent %}
+	Replace this
+	{% endblock %}
+	</div>
+	</body>
+</html>
+
+<!--
+<ul>
+<li><a href="sites.html"
+						{% ifequal path '/sites.html' %}
+			class="selected"
+							{% endifequal %}
+>Sites</a></li>
+
+<li><a href="topics.html"
+						{% ifequal path '/topics.html' %}
+			class="selected"
+								{% endifequal %}
+>Topics</a></li>
+
+<li><a href="/login"
+						{% ifequal path '/login' %}
+			class="selected"
+								{% endifequal %}
+>Login</a></li>
+
+<li><a href="/index"
+						{% ifequal path '/index' %}
+			class="selected"
+							{% endifequal %}
+>Index</a></li>
+</ul> 
+-->

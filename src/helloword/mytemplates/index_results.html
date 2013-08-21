@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+
+  <div class="name_user">
+  	<a> User: {{user}} </a>
+   <!-- <a href="{{ url|safe }}">{{ url_linktext }}</a></div> -->
+
+<form action="/results" method="get">
+      <div><input type="text" id="content" name="content" rows="3" cols="60"></div>
+      <div><input type="submit" name="search" value="Search" onclick="sprawdz(form)"></div>
+      <div>
+      <!--<input type="text" placeholder="Enter name objects here" ng-model="nazwaObj">-->
+      <h1> <p>Szukano: {{zmienna}}</p> </h1>
+      </div>
+      </form>
+      
+					
+				 	<div id="allegro"> 
+				 	<p>Allegro: cena {{ cenaAll }} zł </p>
+				 	<a href = {{linkAll}} ><img src= {{imgAll}} /> </a>
+				 	</div>
+				 	
+
+				 	<div id="nokaut"> 
+					<p>Nokaut: cena {{ cenaNok }} zł </p>
+				 	<a href = {{linkNok}} ><img src= {{imgNok}} /> </a>
+					</div>
+				 	<div class="results">		
+				 	<ul>		 
+						 	<li>
+						 		<a>Najniższa znaleziona cena:</a>	
+						 		<p id="minCena">{{cenaMin}}</p>
+						 		<a href ="{{linkMin}}">{{linkMin}}</a>
+						 	</li>
+				 		</ul>
+				 	</div>
+<!--				 	<p>{{produkty}}</p>
+				 	<div class="users">
+				 			{% for p in people %}
+				 	<p>{{p.first_name}}</p>
+				 	<p>{{p.last_name}}</p>
+				 	<p>{{p.email}}</p>
+				 	<p>{{p.nick}}</p>
+					 		{% endfor %} -->
+				 	</div>
+<input type="button" id="getitButton" value="get it" />
+<div id="result">
+
+</div>
+
+  <script type="text/javascript" >
+    function sprawdz(form){
+    if(form.content.value.length!=0){
+        query = document.getElementById('content').value;
+        string = query.replace(/\s+|\s+$/g, '');
+        $("#content").val(string);
+        }
+    }
+
+   </script>
+{% endblock %}

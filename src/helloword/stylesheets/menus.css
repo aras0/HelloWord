@@ -1,0 +1,117 @@
+
+/*appearance options relating to the general design and header*/
+
+html, body{
+    width: 80%;
+    height: 100%;
+}
+
+body{
+    margin: 0;
+    padding: 0 20%;
+    background: #fff9e1;
+    font-family: Verdana;
+}
+
+#top_menu_naglowek{
+    height: 50px;
+    background: #333;
+    text-align: center;
+}
+
+#top-menu{
+    width: 800px;
+    margin: auto;
+    color: #fff;
+}
+
+/*menu*/
+
+ul.menu{
+    margin: 0;
+    padding: 0;
+    list-style: none; //square
+}
+
+ul.menu li{
+    float: left;
+}
+
+/*before action, see expound below (hover)*/
+ul.menu li a{
+    display: block;
+    padding: 16px 20px;
+    text-decoration: none;
+    color: #ccc;
+}
+ /*hover is used when shares, after moving - selected element*/
+ul.menu li a:hover{
+    background: #00CCFF;
+    color: #000;
+}
+
+/*podmenu - the first group of children*/
+
+
+/*Ponieważ nasze menu będzie się rozwijać, musimy zadbać, aby przypadkiem nie przykrył go żaden element z naszej strony. Do tego celu ustalamy dla tego elementu z-index o dość wysokiej wartości*/
+ul.menu ul{
+    position: absolute; /*absolute,fixed,relative*/
+    display: none;
+    margin: 0;
+    padding: 0;
+    background: #00CCFF;
+    z-index: 100; /*auto,100*/
+    list-style: none;
+}
+
+ul.menu ul li{
+    position: relative;
+    float: none;
+}
+
+ul.menu ul li a{
+    color: #000;
+    width: 200px;
+    text-align: left;
+}
+
+
+
+ul.menu ul li a:hover{
+    color: #ccc;
+    background: #333;
+}
+
+ul.menu ul li ul{
+    position: absolute;
+    top: 0;
+    left: 200px;
+    display: none;
+    z-index: 500;
+    list-style: none;
+}
+
+ul.menu ul li ul li{
+    list-style-type: none;
+    position: relative;
+}
+	/*
+*/
+/*klasy diwów-ułożenie wiadomości na stronie - klasy*/
+
+#div_inside{
+	   width: 800px;
+    margin: auto;
+    margin-top: 20px;
+    text-align: justify;
+
+}
+
+#div_outside{
+    text-align: center;
+}
+
+#p11, #p12, #p121, #p13, #p41, #p42{
+		display: none;
+	
+	}

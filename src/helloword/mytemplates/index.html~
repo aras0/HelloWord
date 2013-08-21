@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+<h1>Application 'Wyszukiwarka Ofert': </h1>
+<p>
+Welcome to the site dedicated to 
+search best commercial offers
+on websites Allegro and Nokaut
+</p>
+{% endblock %}
