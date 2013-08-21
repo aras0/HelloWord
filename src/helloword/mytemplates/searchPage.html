@@ -4,19 +4,22 @@
 
 <body>
 
-         <p name="user">User: {{user}}</p>
-  <!--    <a href="{{url}}">{{url_linktext}}</a> -->
 
-    <form action="/results" method="get">
+
+    <form action="/search" method="post">
       <div><input type="text" id="content" name="content" rows="3" cols="60"></div>
       <div><input type="submit" name="search" value="Search" onclick="sprawdz(form)"></div>
     </form>
+    	<div id="loading">
+				Loading...			
+			</div>
+			
 
     <input type="button" id="getitButton" value="get it" />
     <div id="result">
         </div>
 
-    <script type="text/javascript">
+    <script>
     function sprawdz(form){
     if(form.content.value.length!=0){
         query = document.getElementById('content').value;
@@ -24,5 +27,22 @@
         $("#content").val(string);
         }
     }
+    
+    	function updateOfert(){
+    		$.ajax({
+	    	url: "/results",
+	    	type: "GET",
+	    	cache: false,
+	    	success: function(fragment){
+	    		$("#loading").html(fragment);
+	    	
+	    		}
+	    	});
+    	setTimeout('updateOfert()', 4000);
+    	}
+    	updateOfert();
+
+    	
+
     </script>
 {% endblock %}

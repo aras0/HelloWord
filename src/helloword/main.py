@@ -7,11 +7,11 @@ import jinja2
 import os
 from google.appengine.api import users
 from google.appengine.ext import db
-import modul_13_1 as allegro
-import modul_12_3 as nokaut
+import lib.modul_13_1 as allegro
+import lib.modul_12_3 as nokaut
 import ast
 import urllib
-from datetime import date
+from datetime import datetime
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -56,10 +56,18 @@ def DropDB():
 # A Model for a Object
 class Object(db.Model):
     """Models an individual Guestbook entry with author, content, and date. # or -> db.ReferenceProperty()"""
-    author = db.StringProperty()
-    content = db.StringProperty(multiline=True)
-    dates = db.DateProperty(auto_now_add=True)
+    author = db.EmailProperty()
+    content = db.StringProperty()
+    dates = db. DateTimeProperty(auto_now_add=True)
     licznik = db.IntegerProperty()
+    lalegro = db.StringProperty()
+    lnokaut = db.StringProperty()
+    calegro = db.FloatProperty()
+    cnokaut = db.FloatProperty()
+    imgalegro = db.StringProperty()
+    imgnokaut = db.StringProperty()
+
+# class BestObject(Object):
 
 
 # A Model for a User - nie uzywanie na razie
@@ -69,7 +77,6 @@ class User(db.Model):
     name = db.StringProperty()
 
 #-------------------------------------- class
-
 
 class Render(webapp2.RequestHandler):
     def __init__(self, *args, **kwargs):
@@ -95,43 +102,44 @@ class CreateUser(Render):
 
 
 class SearchPage(Render):
+#-----------------------
+# wyswietlenie formularza z mozliwoscia wszukania produktu
     def get(self):
-        user = users.get_current_user()
-        url, url_linktext = Login(self, user)
-        template_values = {
-        'user': user,
-        'url': url,
-        'url_linktext': url_linktext,
-        }
-        doRender(self, 'searchPage.html', template_values)
+        # user = users.get_current_user()
+        # url, url_linktext = Login(self, user)
+
+        # template_values = {
+        # 'user': user,
+        # 'url': url,
+        # 'url_linktext': url_linktext,
+        # }
+        doRender(self, 'searchPage.html')
+
         #self.response.write(MAIN_PAGE_FOOTER_TEMPLATE % (user, url, url_linktext))
 
-
-
-
-class ResultsPage(Render):
+#-----------------------
+# wyszukanie(skrypt) i dodanie do bazy wzyszukanych obiektow
     def post(self):
-        g = Object()
+        # a = Object.all()
+        # produkty = a.filter('author =', aut).filter('content =', zmienna).count()
+        # g.licznik = produkty+1
+        # print g.licznik
+        # g.put()
+        # msg= self.request.get('messages')
+        # newobiekt = Object(user="aras", content=msg, licznik=g.licznik)
+        # newobiekt.put()
+        # doRender(self, 'resultsform.html')
+
         zmienna = self.request.get('content')
         user = users.get_current_user()
-        url, url_linktext = Login(self, user)
-
-    def get(self):
-        #DropDB()
-        g = Object()
-        zmienna = self.request.get('content')
-        user = users.get_current_user()
-
-        url, url_linktext = Login(self, user)
-
-
+# skrypt allegro
         allegro1 = allegro.loadAlegro(zmienna)
         allegro2 = str(allegro1)
         allegro3 = [item.encode('ascii') for item in ast.literal_eval(allegro2)]
-
-        #self.response.write(allegro3)
+# skrypt nokaut
         nok = nokaut.downlNokaut(self.request.get('content'), 'a8839b1180ea00fa1cf7c6b74ca01bb5')
 
+# tworzenie zmiennych -dodanie do bazy
         cenaAll = allegro3[0]
         linkAll = allegro3[1]
         imgAll = allegro3[2]
@@ -144,28 +152,129 @@ class ResultsPage(Render):
         cenaAll = float(cenaAll)
         cenaNok = float(cenaNok)
 
+# dodanie do bazy wyniku wyszukania
+
+        #if user:
+        obj = Object()
+        if user:
+            aut = user.email()
+            obj.author = aut
+            #self.response.write('<p> author %s </p>' % aut)
+
+
+        obj.content = zmienna
+        a = Object.all()
+        #produkty = a.filter('content =', zmienna).count()
+        produkty = db.Query(Object).filter('content =', zmienna).order('-dates')
+        print produkty
+        #obj.licznik = produkty.licznik+1
+
+        obj.lalegro = linkAll
+        obj.lnokaut = linkNok
+        obj.calegro = cenaAll
+        obj.cnokaut = cenaNok
+        obj.imgalegro = imgAll
+        obj.imgnokaut = imgNok
+        obj.put()
+
+
+
+# najlepsza oferta? ->  dodanie do bazy - nowy model (lub wyszukanie zapytaniem z bazy - po data)
+# wyszukanie minimum - najlepszej oferty - nowy Model ??
+        # if cenaAll < cenaNok:
+        #     cenaMin = cenaAll
+        #     linkMin = linkAll
+        # else:
+        #     cenaMin = cenaNok
+        #     linkMin = linkNok
+# #-------------- najlepsza oferta i licznik ------- !!!
+        doRender(self, 'searchPage.html')
+
+''' Model Object
+            author = db.StringProperty()
+            content = db.StringProperty(multiline=True)
+            dates = db.DateProperty(auto_now_add=True)
+            licznik = db.IntegerProperty()
+            lalegro = db.StringProperty()
+            lnokaut = db.StringProperty()
+            calegro = db.StringProperty()
+            cnokaut = db.StringProperty()'''
+
+class ResultsPage(Render):
+    # def post(self):
+    #     g = Object()
+    #     zmienna = self.request.get('content')
+    #     user = users.get_current_user()
+    #     url, url_linktext = Login(self, user)
+
+#-----------------------
+# zapytanie do bazy o wynik szukania
+    def get(self):
+        #DropDB()
+        # g = Object()
+        # zmienna = self.request.get('content')
+        # user = users.get_current_user()
+
+        # url, url_linktext = Login(self, user) -------- !!!
+
+
+        # allegro1 = allegro.loadAlegro(zmienna)
+        # allegro2 = str(allegro1)
+        # allegro3 = [item.encode('ascii') for item in ast.literal_eval(allegro2)]
+
+        #self.response.write(allegro3)
+        # nok = nokaut.downlNokaut(self.request.get('content'), 'a8839b1180ea00fa1cf7c6b74ca01bb5')
+
+        # cenaAll = allegro3[0]
+        # linkAll = allegro3[1]
+        # imgAll = allegro3[2]
+
+        # cenaNok = nok[0]
+        # Nok = nok[1]
+        # linkNok = Nok[0]
+        # imgNok = Nok[1]
+
+        # cenaAll = float(cenaAll)
+        # cenaNok = float(cenaNok)
+        zmienna = self.request.get('content')
+        user = users.get_current_user()
+        querty = db.Query(Object).order('-dates')
+        result = querty.fetch(1)
+
+        for results in result:
+            zmienna = results.content
+            licz = results.licznik
+            linkAll = results.lalegro
+            linkNok = results.lnokaut
+            cenaAll = results.calegro
+            cenaNok = results.cnokaut
+            imgAll = results.imgalegro
+            imgNok = results.imgnokaut
+            self.response.write('<p> maximum3 %s %s</p>' % (zmienna, user ))
+
+# wyszukanie minimum - najlepszej oferty - nowy Model ------
         if cenaAll < cenaNok:
             cenaMin = cenaAll
             linkMin = linkAll
         else:
             cenaMin = cenaNok
             linkMin = linkNok
+#--------------------------------------------------------
 
-        if user:
-            aut = user.nickname()
-            g.author = aut
-            g.content = zmienna
+        # if user:
+        #     aut = user.nickname()
+        #     g.author = aut
+        #     g.content = zmienna
 
-            a = Object.all()
-            produkty = a.filter('author =', aut).filter('content =', zmienna).count()
-            g.licznik = produkty+1
-            print g.licznik
-            g.put()
+        #     a = Object.all()
+        #     produkty = a.filter('author =', aut).filter('content =', zmienna).count()
+        #     g.licznik = produkty+1
+        #     print g.licznik
+        #     g.put()
 
         template_values = {
             'user': user,
             'zmienna': zmienna,
-            'allegro3': allegro3,
             'imgAll': imgAll,
             'linkAll': linkAll,
             'cenaAll': cenaAll,
@@ -174,79 +283,102 @@ class ResultsPage(Render):
             'cenaNok': cenaNok,
             'cenaMin': cenaMin,
             'linkMin': linkMin,
-            'url': url,
-            'url_linktext': url_linktext,
-            'produkty': produkty,
-
         }
 
-        #self.render_template('mytemplates/index_results.html', template_values=template_values)
         doRender(self, 'index_results.html', template_values)
-
-        if user:
-            q = Object.all()
-            wynik = q.filter('author =', aut).order('-dates')
-            limitData = date.today()
-            limitData2 = date(limitData.year, limitData.month, limitData.day-1)
-            wynik.filter('dates >', limitData2)
-            results = wynik.fetch(5)
-            for user in results:
-                user.dates
-                self.response.write('<blockquote>%s time: %s</blockquote>' % (user.content, user.dates))
-                self.response.write('<a href ="%s"> allegro </a>' % linkAll)
-                self.response.write('<a href ="%s"> nokaut </a>' % linkNok)
-            q2 = Object.all()
-            pr = q2.order('content')
-
-            maximum = 0
-            maximum2 = 0
-            maximum3 = 0
-            obiekt = ''
-            obiekt2 = ''
-            obiekt3 = ''
-
-            query = Object.all()
-            for q in query:
-                if q.licznik > 0 and q.licznik > maximum:
-                    print ".....", q.content, q.licznik
-                    maximum = q.licznik
-                    obiekt = q.content
-                if q.licznik > 0 and q.licznik > maximum2 and q.content != obiekt:
-                    print ".....", q.content, q.licznik
-                    maximum2 = q.licznik
-                    obiekt2 = q.content
-                if q.licznik > 0 and q.licznik > maximum3 and q.content != obiekt and q.content != obiekt2:
-                    print ".....", q.content, q.licznik
-                    maximum3 = q.licznik
-                    obiekt3 = q.content
-                    #krotnosc = query.filter('author =', aut).order('-dates' )
-
-            #self.response.write('<blockquote>%s time: %s</blockquote>' % (user.content, user.dates))
-            if obiekt:
-                self.response.write('<p> maximum1 %s %s</p>' % (obiekt, maximum))
-            if obiekt2: 
-                self.response.write('<p> maximum2 %s %s</p>' % (obiekt2, maximum2))
-            if obiekt3: 
-                self.response.write('<p> maximum3 %s %s</p>' % (obiekt3, maximum3))
-        # else:
-        #     produkty = ""
-        #     maximum = ""
-        #     maximum2 = ""
-        #     maximum3 = ""
-        #     obiekt = ""
-        #     obiekt2 = ""
-        #     obiekt3 = ""
-
-# class MyHandler(webapp2.RequestHandler):
-#     def get(self):
 #         user = users.get_current_user()
 #         if user:
-#             greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
-#                         (user.nickname(), users.create_logout_url('/')))
-#         else:
-#             greeting = ('<a href="%s">Sign in or register</a>.' %
-#                         users.create_login_url('/'))
-#         self.response.out.write('<html><body>%s</body></html>' % greeting)
+#             q = Object.all()
+#             wynik = q.filter('author =', aut).order('-dates')
+#             limitData = date.today()
+#             limitData2 = date(limitData.year, limitData.month, limitData.day-1)
+#             wynik.filter('dates >', limitData2)
+#             results = wynik.fetch(5)
+#             for user in results:
+#                 user.dates
+#                 self.response.write('<blockquote>%s time: %s</blockquote>' % (user.content, user.dates))
+#                 self.response.write('<a href ="%s"> allegro </a>' % linkAll)
+#                 self.response.write('<a href ="%s"> nokaut </a>' % linkNok)
+#             q2 = Object.all()
+#             pr = q2.order('content')
+
+#             maximum = 0
+#             maximum2 = 0
+#             maximum3 = 0
+#             obiekt = ''
+#             obiekt2 = ''
+#             obiekt3 = ''
+
+#             query = Object.all()
+#             for q in query:
+#                 if q.licznik > 0 and q.licznik > maximum:
+#                     print ".....", q.content, q.licznik
+#                     maximum = q.licznik
+#                     obiekt = q.content
+#                 if q.licznik > 0 and q.licznik > maximum2 and q.content != obiekt:
+#                     print ".....", q.content, q.licznik
+#                     maximum2 = q.licznik
+#                     obiekt2 = q.content
+#                 if q.licznik > 0 and q.licznik > maximum3 and q.content != obiekt and q.content != obiekt2:
+#                     print ".....", q.content, q.licznik
+#                     maximum3 = q.licznik
+#                     obiekt3 = q.content
+#                     #krotnosc = query.filter('author =', aut).order('-dates' )
+
+#             #self.response.write('<blockquote>%s time: %s</blockquote>' % (user.content, user.dates))
+#             if obiekt:
+#                 self.response.write('<p> maximum1 %s %s</p>' % (obiekt, maximum))
+#             if obiekt2: 
+#                 self.response.write('<p> maximum2 %s %s</p>' % (obiekt2, maximum2))
+#             if obiekt3: 
+#                 self.response.write('<p> maximum3 %s %s</p>' % (obiekt3, maximum3))
+#         # else:
+#         #     produkty = ""
+#         #     maximum = ""
+#         #     maximum2 = ""
+#         #     maximum3 = ""
+#         #     obiekt = ""
+#         #     obiekt2 = ""
+#         #     obiekt3 = ""
+
+# # class MyHandler(webapp2.RequestHandler):
+# #     def get(self):
+# #         user = users.get_current_user()
+# #         if user:
+# #             greeting = ('Welcome, %s! (<a href="%s">sign out</a>)' %
+# #                         (user.nickname(), users.create_logout_url('/')))
+# #         else:
+# #             greeting = ('<a href="%s">Sign in or register</a>.' %
+# #                         users.create_login_url('/'))
+# #         self.response.out.write('<html><body>%s</body></html>' % greeting)
+
+
+
+
+class Statistic(Render):
+    def get(self):
+        user = users.get_current_user()
+        if user:
+            self.response.out.write('<p>%s</p>' % user)
+            # q = Object.all()
+            wynik = db.Query(Object).order('-author')
+            chat_list = wynik.fetch(limit=100)
+            for w in chat_list:
+                fraze = w.content
+                user = w.author
+                data = w.dates
+
+                if w.author == user:
+
+                    #self.response.out.write('<p>szukal: %s -  %s  %s</p>' % (fraze, user, data))
+                    # q = Object.all()
+                    # wynik = q.filter('author =', aut).order('-dates')
+                    today = datetime.today()
+                    # limitData.isoformat()
+                    limitData2 = datetime(today.year, today.month, today.day-2)
+                    if w.dates > limitData2:
+                        self.response.out.write('<p>szukal: %s %s %s </p>' % (user, fraze, w.dates))
+
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -274,8 +406,8 @@ class LoginHandler(webapp2.RequestHandler):
     #         doRender(self, 'loggedin.html', {})
     #     else:
     #         doRender(self, 'loginscreen.html', {'error': 'Incorrect password'})
-
-
+    
+#-----------------------------------------
 
 
 
@@ -286,6 +418,7 @@ application = webapp2.WSGIApplication([
     ('/createCount/', CreateUser),
     ('/login', LoginHandler),
     ('/index', MainHandler),
+    ('/statistic', Statistic),
     ], debug=True)
 
 
@@ -293,11 +426,15 @@ application = webapp2.WSGIApplication([
 #     application = webapp2.WSGIApplication([
 
 #         ('/results', ResultsPage),
-#         ('/search/', MainPage),
-#         ('/results_user', ResultsUserPage),
-#         ('/', MyHandler),
+#         ('/search', SearchPage),
+#         #('/results_user', ResultsUserPage),
+#         ('/createCount/', CreateUser),
+#         ('/login', LoginHandler),
+#         ('/index', MainHandler),
+#         ('/chat', ChatHandler),
+#         ('/messages',MesagesHandler),
 #         ], debug=True)
-#     wsgiref.handlers.CGIHandler().run(application)
+#     #wsgiref.handlers.CGIHandler().run(application)
 
 # if __name__=='__main__':
-#      main()
+#     main()
